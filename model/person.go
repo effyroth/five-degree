@@ -1,6 +1,7 @@
 package model
 
 import (
+	"../util"
 	"encoding/json"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
@@ -133,14 +134,17 @@ func (p *Person) InDegreeOne(id int) (result bool) {
 	return true
 }
 
-func (p *Person) SetDegreeTwo(ids []int) (err error) {
+func (p *Person) SetDegreeTwo() (err error) {
+
+	degree1ids, err := p.GetDegreeOne()
+	degree2ids := CalcDegreeTwo(&degree1ids)
 
 	conn := redisPool.Get()
 	defer conn.Close()
 
 	key := getDegreeTwoKey(p.Id)
 	conn.Send("DEL", key)
-	for _, id := range ids {
+	for _, id := range *degree2ids {
 
 		conn.Send("ZADD", key, id, id)
 	}
@@ -181,6 +185,30 @@ func (p *Person) InDegreeTwo(id int) (result bool) {
 		return false
 	}
 	return true
+}
+
+//return ralationship if exist
+func (p *Person) IsDegreeThree(id int) (result bool, array *[]int) {
+
+	conn := redisPool.Get()
+	defer conn.Close()
+
+	array1, err := p.GetDegreeOne()
+
+	other, err := GetPerson(id)
+	array2, err := other.GetDegreeTwo()
+	if err != nil {
+		fmt.Println(err.Error())
+		return false, nil
+	}
+	array3 := util.Inter(&array1, &array2)
+	// values, err := redis.Values(conn.Do("ZRANGEBYSCORE", key, id, id))
+	// fmt.Println(len(values), err)
+	// redis.ScanSlice(values, &ids)
+	if len(*array3) == 0 {
+		return false, nil
+	}
+	return true, array3
 }
 
 func getDegreeOneKey(id int) string {

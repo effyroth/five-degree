@@ -21,12 +21,13 @@ func main() {
 	// array2 := model.GetDegreeOneInter(p.Id, q.Id)
 	// fmt.Println(array2)
 
-	rids, _ := p.GetDegreeOne()
-	result := model.CalcDegreeTwo(&rids)
-	fmt.Println(result)
-	p.SetDegreeTwo(*result)
+	// rids, _ := p.GetDegreeOne()
+	// result := model.CalcDegreeTwo(&rids)
+	// fmt.Println(result)
+	p.SetDegreeTwo()
 	degreetwo, _ := p.GetDegreeTwo()
 	fmt.Println(degreetwo)
+	p.IsDegreeThree(10001)
 
 	// p.InDegreeOne(1)
 	// p.InDegreeOne(6)
