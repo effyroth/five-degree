@@ -25,10 +25,18 @@ func main() {
 	// result := model.CalcDegreeTwo(&rids)
 	// fmt.Println(result)
 	p.SetDegreeTwo()
-	degreetwo, _ := p.GetDegreeTwo()
-	fmt.Println(degreetwo)
+	// degreetwo, _ := p.GetDegreeTwo()
+	q.SetDegreeTwo()
+	// degreetwo2, _ := q.GetDegreeTwo()
+	// fmt.Println(degreetwo)
 	p.IsDegreeThree(10001)
 
+	ok, array := p.IsDegreeFour(q.Id)
+	if ok {
+		fmt.Println(ok, array)
+	} else {
+		fmt.Println(ok, array)
+	}
 	// p.InDegreeOne(1)
 	// p.InDegreeOne(6)
 

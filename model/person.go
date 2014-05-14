@@ -194,7 +194,6 @@ func (p *Person) IsDegreeThree(id int) (result bool, array *[]int) {
 	defer conn.Close()
 
 	array1, err := p.GetDegreeOne()
-
 	other, err := GetPerson(id)
 	array2, err := other.GetDegreeTwo()
 	if err != nil {
@@ -202,9 +201,26 @@ func (p *Person) IsDegreeThree(id int) (result bool, array *[]int) {
 		return false, nil
 	}
 	array3 := util.Inter(&array1, &array2)
-	// values, err := redis.Values(conn.Do("ZRANGEBYSCORE", key, id, id))
-	// fmt.Println(len(values), err)
-	// redis.ScanSlice(values, &ids)
+	if len(*array3) == 0 {
+		return false, nil
+	}
+	return true, array3
+}
+
+//return ralationship if exist
+func (p *Person) IsDegreeFour(id int) (result bool, array *[]int) {
+
+	conn := redisPool.Get()
+	defer conn.Close()
+
+	array1, err := p.GetDegreeTwo()
+	other, err := GetPerson(id)
+	array2, err := other.GetDegreeTwo()
+	if err != nil {
+		fmt.Println(err.Error())
+		return false, nil
+	}
+	array3 := util.Inter(&array1, &array2)
 	if len(*array3) == 0 {
 		return false, nil
 	}
