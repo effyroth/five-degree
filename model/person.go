@@ -39,9 +39,9 @@ func (p *Person) SetPerson() error {
 	return nil
 }
 
-func ExistPerson() {
+// func ExistPerson() {
 
-}
+// }
 
 func GetPerson(Id int) (result Person, err error) {
 	conn := redisPool.Get()
@@ -50,7 +50,7 @@ func GetPerson(Id int) (result Person, err error) {
 	// conn.Send("GET", key)
 	// var bytes []byte
 	bytes, err := redis.Bytes(conn.Do("GET", key))
-	fmt.Println(bytes, err)
+	// fmt.Println(bytes, err)
 	if err != nil {
 		return result, err
 	}
@@ -89,7 +89,8 @@ func (p *Person) SetDegreeOne(ids []int) (err error) {
 	defer conn.Close()
 
 	key := getDegreeOneKey(p.Id)
-	for id := range ids {
+	conn.Send("DEL", key)
+	for _, id := range ids {
 
 		conn.Send("ZADD", key, id, id)
 	}
@@ -113,13 +114,33 @@ func (p *Person) GetDegreeOne() (ids []int, err error) {
 	return ids, nil
 }
 
+func (p *Person) InDegreeOne(id int) (result bool) {
+
+	conn := redisPool.Get()
+	defer conn.Close()
+
+	key := getDegreeOneKey(p.Id)
+	values, err := redis.Values(conn.Do("ZRANGEBYSCORE", key, id, id))
+	// fmt.Println(len(values), err)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	// redis.ScanSlice(values, &ids)
+	if len(values) == 0 {
+		return false
+	}
+	return true
+}
+
 func (p *Person) SetDegreeTwo(ids []int) (err error) {
 
 	conn := redisPool.Get()
 	defer conn.Close()
 
 	key := getDegreeTwoKey(p.Id)
-	for id := range ids {
+	conn.Send("DEL", key)
+	for _, id := range ids {
 
 		conn.Send("ZADD", key, id, id)
 	}
@@ -141,6 +162,25 @@ func (p *Person) GetDegreeTwo() (ids []int, err error) {
 	}
 	redis.ScanSlice(values, &ids)
 	return ids, nil
+}
+
+func (p *Person) InDegreeTwo(id int) (result bool) {
+
+	conn := redisPool.Get()
+	defer conn.Close()
+
+	key := getDegreeTwoKey(p.Id)
+	values, err := redis.Values(conn.Do("ZRANGEBYSCORE", key, id, id))
+	// fmt.Println(len(values), err)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	// redis.ScanSlice(values, &ids)
+	if len(values) == 0 {
+		return false
+	}
+	return true
 }
 
 func getDegreeOneKey(id int) string {

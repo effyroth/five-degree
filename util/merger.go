@@ -1,7 +1,7 @@
 package util
 
-func Inter(a *[]int64, b *[]int64) *[]int64 {
-	c := []int64{}
+func Inter(a *[]int, b *[]int) *[]int {
+	c := []int{}
 
 	var ahead int
 	var bhead int
@@ -22,11 +22,11 @@ func Inter(a *[]int64, b *[]int64) *[]int64 {
 	return &c
 }
 
-func Union(a *[]int64, b *[]int64) *[]int64 {
+func Union(a *[]int, b *[]int) *[]int {
 	if len(*a) == 0 {
 		return b
 	}
-	c := []int64{}
+	c := []int{}
 	var ahead int
 	var bhead int
 	for ahead != len(*a) && bhead != len(*b) {
